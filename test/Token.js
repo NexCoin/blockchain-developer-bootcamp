@@ -51,9 +51,7 @@ describe('Token', () => {
 			expect(await token.balanceOf(deployer.address)).to.equal(totalSupply)
 			console.log( "Testing " + await token.totalSupply() )
 		})
-		console.log(async () => {console.log( "in await now " + (await token.name()))})
 		
-		//dname()
-		})
+	})
 	
 })
