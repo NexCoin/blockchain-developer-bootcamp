@@ -11,3 +11,12 @@ GAS_REPORT=true npx hardhat test
 npx hardhat node
 npx hardhat run scripts/deploy.js
 ```
+
+I should add this....
+### 5 Token Transfers
+
+Look on here for needed function documentation... 
+
+ERC-20: Standards [https://eips.ethereum.org/EIPS/eip-20](https://eips.ethereum.org/EIPS/eip-20)
+
+Solidity Event Documentation [https://docs.soliditylang.org/en/v0.8.13/contracts.html#events](https://docs.soliditylang.org/en/v0.8.13/contracts.html#events)
