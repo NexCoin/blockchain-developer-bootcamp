@@ -15,6 +15,7 @@ contract Token {
 	
 	event Transfer(address indexed from, address indexed to, uint256 value);
 	event Approval(address indexed owner,address indexed spender, uint256 value);
+	
 	// Send Tokens
 	constructor(string memory _name,
 				string memory _symbol,
@@ -77,9 +78,10 @@ contract Token {
 		public
 		returns (bool success)
 	{	
-		// checking approval
-		require(_value <= balanceOf[_from]);
+		//console.log(_from, _to, _value);   // checking approval
 		require(_value <= allowance[_from][msg.sender]);
+		require(_value <= balanceOf[_from]);
+		
 		
 		// reset allowance
 		allowance[_from][msg.sender] = allowance[_from][msg.sender] - _value;
