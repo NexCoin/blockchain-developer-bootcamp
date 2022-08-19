@@ -10,11 +10,14 @@ contract Exchange {
 	mapping(address => mapping(address => uint256)) public tokens;
 	mapping(uint256 => _Order) public Orders;
 	uint256 public orderCount;
+	mapping(uint256 => bool) public orderCancelled;
+
 
 	event Deposit(address token, address user, uint256 amount, uint256 balance);
 	event Withdrawal(address token, address user, uint256 amount, uint256 balance); 
 	event Order(uint256 id, address user, address tokenGet, uint256 amountGet, address tokenGive, uint256 amountGive, uint256 timestamp); 
-
+	event Cancel(uint256 id, address user, address tokenGet, uint256 amountGet, address tokenGive, uint256 amountGive, uint256 timestamp);
+	
 	struct _Order {
 		uint256 id;
 		address user;
@@ -88,11 +91,18 @@ contract Exchange {
 
 	}
 
-	// function cancelOrder(something, and_something, SomethingElse) public {
+	function cancelOrder(uint256 _id) public {
+		// get the requested order
+		_Order storage _order = Orders[_id];
+		// check if they are the owner of order
+		require(address(_order.user) == msg.sender);
+		// Check if order exist
+		require(_order.id == _id);
+		// cancel this order
+		orderCancelled[_id] = true;
 
-
-
-	// }
+		emit Cancel(_order.id, _order.user, _order.tokenGet, _order.amountGet, _order.tokenGive, _order.amountGive, _order.timestamp);
+	}
 
 	// function fillOrder(something, and_something, SomethingElse) public {
 
