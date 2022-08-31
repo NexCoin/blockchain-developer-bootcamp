@@ -82,7 +82,7 @@ contract Exchange {
 
 	//Make Orders
 	function makeOrder(address _tokenGet, uint _amountGet, address _tokenGive, uint256 _amountGive) public {
-		require(_amountGive <= balanceOf(_tokenGive, msg.sender));
+		//require(_amountGive <= balanceOf(_tokenGive, msg.sender));
 
 		orderCount++;
 
