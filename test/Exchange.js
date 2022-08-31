@@ -208,7 +208,7 @@ describe('  Exchange Tests \n', () => {
 		})
 	})
 
-	describe('Order actions', () => {
+	describe('Order actions', async () => {
 		let transaction, result
 		let amount = tokens(1)
 
@@ -217,12 +217,25 @@ describe('  Exchange Tests \n', () => {
 			// Approve Tokens
 			transaction = await token1.connect(user1).approve(exchange.address, amount)
 			result = await transaction.wait()
+			
 			// Deposit Tokens
 			transaction = await exchange.connect(user1).depositToken(token1.address, amount)
 			result = await transaction.wait()
 
+			// Give Tokens to user2
+		 	transaction = await token2.connect(deployer).transfer(user2.address, tokens(100))
+		 	result = await transaction.wait()
+			
+			// approve Um.. Deposits tokens spend for exchange
+			transaction = await token2.connect(user2).approve(exchange.address, tokens(2))
+			result = await transaction.wait()
+			
+			// user2 deposits tokens
+			transaction = await exchange.connect(user2).depositToken(token2.address, tokens(2))
+			result = await transaction.wait()
+			
 			// Make Order
-			transaction = await exchange.connect(user1).makeOrder(token2.address, tokens(1), token1.address, tokens(1))
+			transaction = await exchange.connect(user1).makeOrder(token2.address, amount, token1.address, amount)
 			result = await transaction.wait()
 		}) 
 
@@ -236,7 +249,7 @@ describe('  Exchange Tests \n', () => {
 
 				it('updates cancelled orders', async () => {
 					expect(await exchange.orderCancelled(1)).to.equal(true)
-				}) //it test
+				})
 
 				it('emits a Cancel event', async () => {
 			 	const event = result.events[0]
@@ -280,7 +293,103 @@ describe('  Exchange Tests \n', () => {
 				})
 			})  // Failures
 		})
-	})	// Order actions
- 
-})
-  // END Exchange Block  //
+		//---------------------------------------------
+		//  FILL THE ORDERS    EXECUTE TRADE
+		//			TEST  TEST  TEST
+		//----------------------------------------------
+
+		describe('Fill Orders', async ()  => {
+			
+			
+
+			describe('Success',async () =>  {
+			
+			beforeEach(async () => {
+			// execute fill the order
+			transaction = await exchange.connect(user2).fillOrder('1')
+			result = await transaction.wait()
+			})
+
+			it('execute trade - user1 gave user2 1 DAPP Token', async () => {
+				// Token Give
+				expect(await exchange.balanceOf(token1.address, user1.address)).to.equal(tokens(0))
+			})	
+			
+			it('execute trade user2 gave user1 1 SomeThing Token', async () => {
+				expect(await exchange.balanceOf(token2.address, user2.address)).to.equal(tokens(.9))
+			})
+			
+			it('execute trade and user2 was charged 10% trading fees', async () => {
+				expect(await exchange.balanceOf(token1.address, feeAccount.address)).to.equal(tokens(0))
+			})
+
+			it('the trade did take place', async () => {
+				expect(await exchange.balanceOf(token2.address, user1.address)).to.equal(tokens(1))
+				expect(await exchange.balanceOf(token1.address, user2.address)).to.equal(tokens(1))
+			})
+			
+			it('the exchange charged fee and made money', async () => {
+				expect(await exchange.balanceOf(token2.address, feeAccount.address)).to.equal(tokens(.1))
+			})
+
+			it('check if filled orders are logged', async () => {
+					expect(await exchange.orderFilled(1)).to.equal(true)
+			})
+
+			it('emits a trade event', async () => {
+				const event = result.events[0]
+				expect (event.event).to.equal('Trade')
+
+				const args = event.args
+				expect(args.id).to.equal(1)
+				expect(args.user).to.equal(user2.address)
+				expect(args.tokenGet).to.equal(token2.address)
+				expect(args.amountGet).to.equal(tokens(1))
+				expect(args.tokenGive).to.equal(token1.address)
+				expect(args.amountGive).to.equal(tokens(1))
+				expect(args.creator).to.equal(user1.address)
+				expect(args.timestamp).to.at.least(1)
+			})
+
+			}) //Success
+
+
+			describe('Failures',async () =>  {
+
+				it('revert if order does not exist', async () => {
+					const invalidOrderId = 99999
+					await expect(exchange.connect(user2).fillOrder(invalidOrderId)).to.be.reverted
+					//expect(await exchange.orderCount()).to.equal(1)
+					// console.log( "Testing feeAccount: " + await exchange.feeAccount() )
+					// console.log( "Testing orderCount: " + await exchange.orderCount() )
+					//console.log( "Testing order 0  =  orderCancelled: " + await exchange.orderCancelled(0) )
+					//console.log( "Testing order 1  =  orderCancelled: " + await exchange.orderCancelled(1) )
+					// console.log( "Testing orderFilled 0  =  : " + await exchange.orderFilled(0) )
+					// 
+				})
+
+				it('revert if order has already been filled', async () => {
+					transaction = await exchange.connect(user2).fillOrder('1')
+					await transaction.wait()
+					// console.log( "Testing orderFilled 1  =  : " + await exchange.orderFilled(1) )
+					await expect(exchange.connect(user2).fillOrder(1)).to.be.reverted
+				})
+
+				it('revert if order has been cancelled', async () => {
+					transaction = await exchange.connect(user1).cancelOrder(1)
+					await transaction.wait()
+					//exchange.connect(user1).cancelOrder(1)
+					//console.log( "Testing order 0  =  orderCancelled: " + await exchange.orderCancelled(0) )
+					//console.log( "Testing order 1  =  orderCancelled: " + await exchange.orderCancelled(1) )
+					await expect(exchange.connect(user2).fillOrder(1)).to.be.reverted
+				})
+				
+
+				it('revert if maybe either user does not have enough tokens', async () => {
+					
+				})
+
+			})
+		})  // Fill Orders
+	})	// Order actions 
+})    // END Exchange Block  //
