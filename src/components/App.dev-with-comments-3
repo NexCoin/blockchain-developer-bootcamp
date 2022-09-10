@@ -1,0 +1,200 @@
+import { useEffect } from 'react';
+import { ethers } from 'ethers';
+import { loadProvider } from '../store/interactions'
+import { useSelector, useDispatch} from 'react-redux'
+//import '../App.css';  =>  MOved to src/index.js
+//import { TOKEN_ABI } from '../abis/Token.json'     //;  <==-----  does NOT WORK !!
+//  MY WAY WORKED  require('../Thingy/file')  => the import { TOKEN-ABI }  thing fked me all up !
+const TOKEN_ABI = require('../abis/Token.json')
+const Exchange = require('../abis/Exchange.json')
+const config = require('../config.json')
+
+
+
+
+function App() {
+  const dispatch = useDispatch()
+
+// load the blockchin data and more
+const loadBlockchainData = async () => {
+  const accounts = await window.ethereum.request({method: 'eth_requestAccounts'})
+  console.log(accounts[0])
+  console.log(accounts)
+
+// Connect Ethers to blockchain
+const provider = loadProvider(dispatch)
+const { chainId } = await provider.getNetwork()
+console.log(chainId)
+
+
+//===================================================================//
+// Connect Ethers to blockchain                                      //
+//const provider = new ethers.providers.Web3Provider(window.ethereum)//
+//dispatch({ type: 'PROVIDER_LOADED', connection: provider })        //
+//const { chainId } = await provider.getNetwork()                    //
+//===================================================================//
+// Get my chainId
+//const { chainId } = await ethers.provider.getNetwork()
+//=======================================
+//          LOOK   LOOK          //
+//const network= await provider.getNetwork()
+//console.log("Connected to chain id: " + network.chainId )
+//another way to do the above----------------------------
+
+/*
+
+//const { chainId } = await provider.getNetwork()
+//console.log("Connected to chain id: " + chainId )
+
+console.log("====Pulled First element from config-json=============\n")
+const chainsId = ()=> {for (const element of Object.entries(config)) {
+  const key = element[0]
+       ,value = element[1]
+       return key;
+} }
+const shChainId = chainsId()
+console.log(shChainId)
+console.log("=============just invoke and assign to Var and use it=\n")
+let myChn = shChainId == chainId
+console.log("chainId == shChainId equals: " + myChn)
+console.log("Use this to validate config.json is same as active getNetwork() thingy")
+
+//     END LOOK     END LOOK     //
+//=======================================*/
+
+// Get Exchange and Token Stuff //
+//Fetch them tokens
+//const DApp = await ethers.getContractAt('Token', config[chainId].DApp.address)
+
+/*
+console.log("=====================================\n")
+console.log(config)
+console.log(config[chainId])
+console.log(config[chainId].exchange)
+console.log(config[chainId].exchange.address)
+console.log("=====================================\n")
+*/
+
+
+/*
+const DApp = await config[chainId].DApp
+//console.log(`DApp Token fetched: ${config.chainId.DApp.address}`)
+console.log(DApp)
+
+console.log(Exchange)
+console.log("=====================================\n")
+
+*/
+
+
+
+
+/*
+// Fetch  Exchange address
+const exchange = config[chainId].exchange
+console.log("Exchange address fetched: " + exchange.address)
+console.log(Object.keys(config))
+console.log(Object.values(config))
+console.log(Object.entries(config))
+
+console.log("=============Begin for loop========================\n")
+for (const [key, value] of Object.entries(config[31337])) {
+  console.log(`key: ${key}, value: ${value}`)
+}
+
+console.log("=============End for loop========================\n")
+
+*/
+
+
+
+
+
+
+
+
+/*   commit out block
+
+
+// Fetch them tokens
+const DApp = config[chainId].DApp
+console.log("DApp Token fetched: " + DApp.address)
+
+const mETH = config[chainId].mETH
+console.log("mETH Token fetched: " + mETH.address)
+
+const mDAI = config[chainId].mDAI
+console.log("mDAI Token fetched: " + mDAI.address)
+
+// DApp Smart Contract
+//let address = "0x5FbDB2315678afecb367f032d93F642f64180aa3" /DApp contractAddressMaybee
+//let abi = TOKEN_ABI
+//let signerOrProvider = provider
+//const token = new ethers.Contract(address, abi, signerOrProvider)
+const token = new ethers.Contract(DApp.address, TOKEN_ABI, provider)
+console.log( token.address )
+const symbol = await token.symbol()
+console.log( symbol )
+const name = await token.name()
+console.log(name)
+// mETH Smart Contract
+// let address = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512" //DApp contractAddressMaybe
+// let abi = WhatEverAbiIs
+// let signerOrProvider = provider
+
+// const tokenmETH = new ethers.Contract(address, abi, signerOrProvider)
+
+// // mDAI Smart Contract
+// let address = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0" //DApp contractAddressMaybe
+// let abi = WhatEverAbiIs
+// let signerOrProvider = provider
+
+//const tokenmDAI = new ethers.Contract(address, abi, signerOrProvider)
+// END token stuff  END  
+
+*/ 
+
+}
+
+
+
+// invoke   or  call loadBlockchainNetwork
+useEffect(() => {
+  loadBlockchainData()
+})
+
+  return (
+    <div>
+
+      {/* Navbar */}
+
+      <main className='exchange grid'>
+        <section className='exchange__section--left grid'>
+
+          {/* Markets */}
+
+          {/* Balance */}
+
+          {/* Order */}
+
+        </section>
+        <section className='exchange__section--right grid'>
+
+          {/* PriceChart */}
+
+          {/* Transactions */}
+
+          {/* Trades */}
+
+          {/* OrderBook */}
+
+        </section>
+      </main>
+
+      {/* Alert */}
+
+    </div>
+  );
+}
+
+export default App;

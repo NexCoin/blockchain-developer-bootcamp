@@ -68,7 +68,7 @@ contract Exchange {
 
 	
 	//Check Balances
-	function balanceOf(address _token, address _user)
+	function balanceOf(address _token, address _user) 
 		public
 		view
 		returns(uint256)
@@ -82,7 +82,7 @@ contract Exchange {
 
 	//Make Orders
 	function makeOrder(address _tokenGet, uint _amountGet, address _tokenGive, uint256 _amountGive) public {
-		//require(_amountGive <= balanceOf(_tokenGive, msg.sender));
+		require(_amountGive <= balanceOf(_tokenGive, msg.sender));
 
 		orderCount++;
 
